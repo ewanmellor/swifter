@@ -35,8 +35,10 @@ open class Socket: Hashable, Equatable {
     deinit {
         close()
     }
-    
-    public var hashValue: Int { return Int(self.socketFileDescriptor) }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(self.socketFileDescriptor)
+    }
     
     public func close() {
         if shutdown {
@@ -92,8 +94,8 @@ open class Socket: Hashable, Equatable {
     }
     
     public func writeData(_ data: Data) throws {
-        try data.withUnsafeBytes { (pointer: UnsafePointer<UInt8>) -> Void in
-            try self.writeBuffer(pointer, length: data.count)
+        try data.withUnsafeBytes { (pointer: UnsafeRawBufferPointer) -> Void in
+            try self.writeBuffer(pointer.baseAddress!, length: data.count)
         }
     }
 
